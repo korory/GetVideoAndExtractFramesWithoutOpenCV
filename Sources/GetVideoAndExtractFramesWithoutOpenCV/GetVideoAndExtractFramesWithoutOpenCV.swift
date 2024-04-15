@@ -56,7 +56,7 @@ public class VideoExtractor: NSObject {
                 
                 if let cgImage = try? imageGenerator.copyCGImage(at: time, actualTime: nil) {
                     let uiImage = UIImage(cgImage: cgImage)
-                    let imageURL = FileManager.default.temporaryDirectory.appendingPathComponent("frame\(i).jpg")
+                    let imageURL = FileManager.default.temporaryDirectory.appendingPathComponent("/StitchingSDK/frame\(i).jpg")
                     if let imageData = uiImage.jpegData(compressionQuality: 1.0) {
                         try imageData.write(to: imageURL)
                         frameURLs.append(imageURL.absoluteString)
