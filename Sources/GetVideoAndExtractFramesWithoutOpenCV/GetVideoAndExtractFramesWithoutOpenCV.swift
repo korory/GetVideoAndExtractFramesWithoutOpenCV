@@ -17,10 +17,10 @@ public class VideoExtractor: NSObject {
         super.init()
     }
     
-    public func getVideoAndReturnAllTheFrames(videoURL: String) {
+    public func getVideoAndReturnAllTheFrames(videoURL: String, selectTimeValue: Int) {
         DispatchQueue.global(qos: .background).async {
             if let url = URL(string: videoURL) {
-                if let allFrames = self.extractFramesFromVideo(at: url) {
+                if let allFrames = self.extractFramesFromVideo(at: url, selectTimeValue: selectTimeValue) {
                     DispatchQueue.main.async {
                         self.delegate?.getVideoAndExtractFrames(self, didFinishExtractingAllFrames: allFrames)
                     }
@@ -39,7 +39,7 @@ public class VideoExtractor: NSObject {
         }
     }
     
-    private func extractFramesFromVideo(at videoURL: URL) -> [String]? {
+    private func extractFramesFromVideo(at videoURL: URL, selectTimeValue: Int) -> [String]? {
         let asset = AVAsset(url: videoURL)
         let imageGenerator = AVAssetImageGenerator(asset: asset)
         imageGenerator.appliesPreferredTrackTransform = true
@@ -48,9 +48,19 @@ public class VideoExtractor: NSObject {
         do {
             let duration = asset.duration
             let durationInSeconds = CMTimeGetSeconds(duration)
+            
+            // Calculate the maximum number of frames allowed based on the duration and selectTimeValue
+            let maxFrames: Int = {
+                let maxFramesPerSecond: Double = 9.0
+                let maxFramesMultiplier = min(selectTimeValue, Int(durationInSeconds)) // Ensure selectTimeValue does not exceed video duration
+                return Int(maxFramesPerSecond * Double(maxFramesMultiplier))
+            }()
+            
             let desiredFPS: Double = 1.0
             let totalFrames = Int(durationInSeconds * desiredFPS)
             
+            var framesTaken = 0 // Track the number of frames taken
+
             for i in 0..<totalFrames {
                 let time = CMTime(seconds: Double(i) / desiredFPS, preferredTimescale: 600)
                 
