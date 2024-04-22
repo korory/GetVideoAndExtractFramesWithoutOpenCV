@@ -49,20 +49,36 @@ public class VideoExtractor: NSObject {
             let duration = asset.duration
             let durationInSeconds = CMTimeGetSeconds(duration)
             
-            // Calculate the maximum number of frames allowed based on the duration and selectTimeValue
-            let maxFrames: Int = {
-                let maxFramesPerSecond: Double = 9.0
-                let maxFramesMultiplier = min(selectTimeValue, Int(durationInSeconds)) // Ensure selectTimeValue does not exceed video duration
-                return Int(maxFramesPerSecond * Double(maxFramesMultiplier))
-            }()
-            
             let desiredFPS: Double = 1.0
+            
             let totalFrames = Int(durationInSeconds * desiredFPS)
             
             var framesTaken = 0 // Track the number of frames taken
-
-            for i in 0..<totalFrames {
-                let time = CMTime(seconds: Double(i) / desiredFPS, preferredTimescale: 600)
+            
+            var desiredFrames: Int
+            
+            if durationInSeconds < 5 {
+                desiredFrames = Int(durationInSeconds) * 5 // 5 frames por segundo
+            } else if durationInSeconds >= 5 && durationInSeconds < 10 {
+                desiredFrames = 12 // Alrededor de 12 fotogramas
+            } else if durationInSeconds >= 10 && durationInSeconds < 15 {
+                desiredFrames = 15 // Alrededor de 15 fotogramas
+            } else if durationInSeconds >= 15 && durationInSeconds < 20 {
+                desiredFrames = 20 // Alrededor de 20 fotogramas
+            } else if durationInSeconds >= 20 && durationInSeconds < 25 {
+                desiredFrames = 25 // Alrededor de 25 fotogramas
+            } else if durationInSeconds >= 25 && durationInSeconds <= 35 {
+                desiredFrames = Int(durationInSeconds) // Un fotograma por segundo
+            } else {
+                desiredFrames = 35 // Hasta un máximo de 35 fotogramas
+            }
+            
+            if desiredFrames > 35 {
+                desiredFrames = 35 // Limitar la cantidad máxima de fotogramas a 35
+            }
+            
+            for i in 0..<desiredFrames {
+                let time = CMTime(seconds: Double(i) / Double(desiredFrames), preferredTimescale: 600)
                 
                 if let cgImage = try? imageGenerator.copyCGImage(at: time, actualTime: nil) {
                     let uiImage = UIImage(cgImage: cgImage)
