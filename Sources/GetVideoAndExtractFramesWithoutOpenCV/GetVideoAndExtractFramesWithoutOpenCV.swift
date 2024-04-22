@@ -54,7 +54,7 @@ public class VideoExtractor: NSObject {
             let desiredFPS: Double = 1.0
             var totalFrames = Int(durationInSeconds * desiredFPS)
             
-            if (totalFrames != 0 && totalFrames > self.maxFramesToExtract) {
+            if (self.maxFramesToExtract != 0 && totalFrames > self.maxFramesToExtract) {
                 totalFrames = self.maxFramesToExtract
             }
             
