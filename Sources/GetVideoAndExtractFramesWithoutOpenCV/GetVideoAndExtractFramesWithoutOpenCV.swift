@@ -13,6 +13,8 @@ public protocol VideoExtractorDelegate: AnyObject {
 public class VideoExtractor: NSObject {
     public var delegate: VideoExtractorDelegate?
     
+    @objc dynamic public var maxFramesToExtract: Int = 0
+    
     public override init() {
         super.init()
     }
@@ -50,7 +52,11 @@ public class VideoExtractor: NSObject {
             let durationInSeconds = CMTimeGetSeconds(duration)
             
             let desiredFPS: Double = 1.0
-            let totalFrames = Int(durationInSeconds * desiredFPS)
+            var totalFrames = Int(durationInSeconds * desiredFPS)
+            
+            if (totalFrames > self.maxFramesToExtract) {
+                totalFrames = self.maxFramesToExtract
+            }
             
             var framesTaken = 0 // Track the number of frames taken
 
