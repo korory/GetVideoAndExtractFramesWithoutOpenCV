@@ -19,10 +19,10 @@ public class VideoExtractor: NSObject {
         super.init()
     }
     
-    public func getVideoAndReturnAllTheFrames(videoURL: String, selectTimeValue: Int) {
+    public func getVideoAndReturnAllTheFrames(videoURL: String) {
         DispatchQueue.global(qos: .background).async {
             if let url = URL(string: videoURL) {
-                if let allFrames = self.extractFramesFromVideo(at: url, selectTimeValue: selectTimeValue) {
+                if let allFrames = self.extractFramesFromVideo(at: url) {
                     DispatchQueue.main.async {
                         self.delegate?.getVideoAndExtractFrames(self, didFinishExtractingAllFrames: allFrames)
                     }
@@ -41,7 +41,7 @@ public class VideoExtractor: NSObject {
         }
     }
     
-    private func extractFramesFromVideo(at videoURL: URL, selectTimeValue: Int) -> [String]? {
+    private func extractFramesFromVideo(at videoURL: URL) -> [String]? {
         let asset = AVAsset(url: videoURL)
         let imageGenerator = AVAssetImageGenerator(asset: asset)
         imageGenerator.appliesPreferredTrackTransform = true
