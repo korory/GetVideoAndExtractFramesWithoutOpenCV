@@ -49,12 +49,6 @@ public class VideoExtractor: NSObject {
             let duration = asset.duration
             let durationInSeconds = CMTimeGetSeconds(duration)
             
-            let desiredFPS: Double = 1.0
-            
-            let totalFrames = Int(durationInSeconds * desiredFPS)
-            
-            var framesTaken = 0 // Track the number of frames taken
-            
             var desiredFrames: Int
             
             if durationInSeconds < 5 {
@@ -65,20 +59,19 @@ public class VideoExtractor: NSObject {
                 desiredFrames = 15 // Alrededor de 15 fotogramas
             } else if durationInSeconds >= 15 && durationInSeconds < 20 {
                 desiredFrames = 20 // Alrededor de 20 fotogramas
-            } else if durationInSeconds >= 20 && durationInSeconds < 25 {
-                desiredFrames = 25 // Alrededor de 25 fotogramas
-            } else if durationInSeconds >= 25 && durationInSeconds <= 35 {
+            } else if durationInSeconds >= 20 && durationInSeconds <= 35 {
                 desiredFrames = Int(durationInSeconds) // Un fotograma por segundo
             } else {
                 desiredFrames = 35 // Hasta un máximo de 35 fotogramas
             }
             
+            // Limitar la cantidad máxima de fotogramas a 35
             if desiredFrames > 35 {
-                desiredFrames = 35 // Limitar la cantidad máxima de fotogramas a 35
+                desiredFrames = 35
             }
             
             for i in 0..<desiredFrames {
-                let time = CMTime(seconds: Double(i) / Double(desiredFrames), preferredTimescale: 600)
+                let time = CMTime(seconds: durationInSeconds * Double(i) / Double(desiredFrames), preferredTimescale: 600)
                 
                 if let cgImage = try? imageGenerator.copyCGImage(at: time, actualTime: nil) {
                     let uiImage = UIImage(cgImage: cgImage)
@@ -89,6 +82,49 @@ public class VideoExtractor: NSObject {
                     }
                 }
             }
+            //            let duration = asset.duration
+            //            let durationInSeconds = CMTimeGetSeconds(duration)
+            //
+            //            let desiredFPS: Double = 1.0
+            //
+            //            let totalFrames = Int(durationInSeconds * desiredFPS)
+            //
+            //            var framesTaken = 0 // Track the number of frames taken
+            //
+            //            var desiredFrames: Int
+            //
+            //            if durationInSeconds < 5 {
+            //                desiredFrames = Int(durationInSeconds) * 5 // 5 frames por segundo
+            //            } else if durationInSeconds >= 5 && durationInSeconds < 10 {
+            //                desiredFrames = 12 // Alrededor de 12 fotogramas
+            //            } else if durationInSeconds >= 10 && durationInSeconds < 15 {
+            //                desiredFrames = 15 // Alrededor de 15 fotogramas
+            //            } else if durationInSeconds >= 15 && durationInSeconds < 20 {
+            //                desiredFrames = 20 // Alrededor de 20 fotogramas
+            //            } else if durationInSeconds >= 20 && durationInSeconds < 25 {
+            //                desiredFrames = 25 // Alrededor de 25 fotogramas
+            //            } else if durationInSeconds >= 25 && durationInSeconds <= 35 {
+            //                desiredFrames = Int(durationInSeconds) // Un fotograma por segundo
+            //            } else {
+            //                desiredFrames = 35 // Hasta un máximo de 35 fotogramas
+            //            }
+            //
+            //            if desiredFrames > 35 {
+            //                desiredFrames = 35 // Limitar la cantidad máxima de fotogramas a 35
+            //            }
+            //
+            //            for i in 0..<desiredFrames {
+            //                let time = CMTime(seconds: Double(i) / Double(desiredFrames), preferredTimescale: 600)
+            //
+            //                if let cgImage = try? imageGenerator.copyCGImage(at: time, actualTime: nil) {
+            //                    let uiImage = UIImage(cgImage: cgImage)
+            //                    let imageURL = FileManager.default.temporaryDirectory.appendingPathComponent("StitchingSDK/frame\(i).jpg")
+            //                    if let imageData = uiImage.jpegData(compressionQuality: 1.0) {
+            //                        try imageData.write(to: imageURL)
+            //                        frameURLs.append(imageURL.absoluteString)
+            //                    }
+            //                }
+            //            }
         } catch {
             print("Error al extraer los frames: \(error.localizedDescription)")
             return nil
